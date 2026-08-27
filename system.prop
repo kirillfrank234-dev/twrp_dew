@@ -1,0 +1,8 @@
+ro.vendor.mediatek.platform=MT6768
+ro.hardware.egl=mali
+ro.product.cpu.pagesize.max=16384
+ro.vendor.miui.region=KZ
+ro.vendor.miui.cust_variant=kz
+ro.product.locale=en-GB
+ro.product.locale.language=kk
+ro.product.locale.region=KZ
