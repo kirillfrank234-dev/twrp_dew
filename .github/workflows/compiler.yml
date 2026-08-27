@@ -1,0 +1,59 @@
+name: Сборка TWRP для Redmi 15C (dew)
+
+on:
+  workflow_dispatch: # Позволяет запускать сборку вручную кнопкой на сайте
+
+env:
+  MANIFEST_URL: "https://github.com"
+  MANIFEST_BRANCH: "twrp-14.0"
+  DEVICE_NAME: "dew"
+  MAKEFILE_NAME: "omni_dew"
+  BUILD_TARGET: "recovery"
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    steps:
+    - name: Подготовка окружения виртуальной машины
+      uses: actions/checkout@v4
+
+    - name: Установка необходимых пакетов компиляции
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y bc bison build-essential ccache curl flex g++-multilib gcc-multilib git gnupg gperf image_utils lib32ncurses5-dev lib32readline8-dev lib32z1-dev liblz4-tool libncurses5 libncurses5-dev libsdl1.2-dev libssl-dev libxml2 libxml2-utils lzop pngcrush rsync schedtool squashfs-tools xsltproc zip zlib1g-dev python3 python3-pip
+
+    - name: Установка утилиты Repo от Google
+      run: |
+        mkdir ~/bin
+        curl https://googleapis.com > ~/bin/repo
+        chmod a+x ~/bin/repo
+        sudo ln -sf ~/bin/repo /usr/bin/repo
+
+    - name: Инициализация репозитория TWRP
+      run: |
+        git config --global user.name "kirillfrank234-dev"
+        git config --global user.email "twrp@builder.local"
+        mkdir twrp && cd twrp
+        repo init --depth=1 -u ${{ env.MANIFEST_URL }} -b ${{ env.MANIFEST_BRANCH }}
+        repo sync -c -j$(nproc --all) --force-sync --no-clone-bundle --no-tags
+
+    - name: Копирование дерева устройств в структуру исходников
+      run: |
+        cd twrp
+        mkdir -p device/xiaomi/${{ env.DEVICE_NAME }}
+        cp -r ../device/xiaomi/${{ env.DEVICE_NAME }}/* device/xiaomi/${{ env.DEVICE_NAME }}/
+
+    - name: Компиляция рекавери (Building Image)
+      run: |
+        cd twrp
+        export ALLOW_MISSING_DEPENDENCIES=true
+        . build/envsetup.sh
+        lunch ${{ env.MAKEFILE_NAME }}-eng
+        mka ${{ env.BUILD_TARGET }}image -j$(nproc --all)
+
+    - name: Загрузка готового файла в репозиторий (Artifacts)
+      uses: actions/upload-artifact@v4
+      with:
+        name: TWRP-Redmi_15C-dew
+        path: twrp/out/target/product/dew/*.img
+        
