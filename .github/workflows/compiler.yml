@@ -28,14 +28,13 @@ jobs:
         curl https://googleapis.com > ~/bin/repo
         chmod a+x ~/bin/repo
         sudo ln -sf ~/bin/repo /usr/bin/repo
-
-    - name: Инициализация репозитория TWRP
+    - name: Install Repo tool
       run: |
-        git config --global user.name "kirillfrank234-dev"
-        git config --global user.email "twrp@builder.local"
-        mkdir twrp && cd twrp
-        repo init --depth=1 -u ${{ env.MANIFEST_URL }} -b ${{ env.MANIFEST_BRANCH }}
-        repo sync -c -j$(nproc --all) --force-sync --no-clone-bundle --no-tags
+        mkdir -p ~/bin
+        curl https://storage.googleapis.com/git-repo-downloads/repo -o ~/bin/repo
+        chmod +x ~/bin/repo
+        sudo ln -sf ~/bin/repo /usr/bin/repo
+    
 
     - name: Копирование дерева устройств в структуру исходников
       run: |
