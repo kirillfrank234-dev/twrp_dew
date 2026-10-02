@@ -7,7 +7,7 @@ env:
   MANIFEST_URL: "https://github.com"
   MANIFEST_BRANCH: "twrp-14.0"
   DEVICE_NAME: "dew"
-  MAKEFILE_NAME: "omni_dew"
+  MAKEFILE_NAME: "twrp_dew"
   BUILD_TARGET: "recovery"
 
 jobs:
